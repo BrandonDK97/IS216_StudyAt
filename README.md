@@ -31,6 +31,12 @@ src="WebApp/Css/img/alarm-clock.png"
 
 <h2>A virtual workspace to help students study from home. </h2>
 <br>
+<h6>Website Link: https://studyat.netlify.app/</h6>
+<p>
+ Login Credentials:
+ Username: test2@gmail.com
+ Password: brandondc
+ </p>
 </div>
 
 # Table of Contents
