@@ -34,7 +34,9 @@ src="WebApp/Css/img/alarm-clock.png"
 <h6>Website Link: https://studyat.netlify.app/</h6>
 <p>
  Login Credentials:
+ <br>
  Username: test2@gmail.com
+ <br>
  Password: brandondc
  </p>
 </div>
