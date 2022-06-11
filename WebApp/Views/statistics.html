@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Statistics</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="../css/uikit.min.css" />
+    <link rel='stylesheet' href='../css/nav.css' />
+
+    <!-- Plotly JS for Graphs-->
+    <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+
+    <style>
+        #app {
+            min-height: 100vh;
+            height: 100%;
+        }
+
+        .bglinear span {
+            color: transparent;
+            font-size: 2em;
+            font-family: "Josefin Sans", sans-serif;
+            -webkit-text-stroke: 2px rgba(133, 133, 133, 1);
+            backface-visibility: none;
+        }
+    </style>
+</head>
+
+<body onload="getDataFromUser()">
+
+    <!-- NAVBAR-->
+    <div class="uk-position-relative ">
+        <img src="" alt="">
+        <div class="uk-position-top">
+            <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+                <div class='uk-navbar-left'>
+                    <a href="roomV2.html" class='uk-navbar-item uk-logo'>
+                        <section class="bglinear">
+                            <span>STUDYAT.</span>
+                        </section>
+                    </a>
+                </div>
+                <div class="uk-navbar-center">
+                    <ul class="uk-navbar-nav">
+                        <li>
+                            <a href="roomv2.html">My Room</a>
+                        </li>
+                        <li>
+                            <a href="profile.html">My Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Start of Vue App -->
+    <div id="app">
+        <!-- Usage Statistics -->
+        <div class="uk-container uk-text-center">
+            <h1 class="uk-light" style="margin-top:65px; margin-bottom:20px;">My Statistics</h1>
+            <div style="padding-bottom:10px;">
+                <button class="uk-button uk-button-default uk-border-pill uk-button-small uk-background-default uk-width-small" @click="display('daily')">Today</button>
+                <button class="uk-button uk-button-default uk-border-pill uk-button-small uk-background-default uk-width-small" @click="display('weekly')" id="weeklyBtn">Weekly</button>
+                <button class="uk-button uk-button-default uk-border-pill uk-button-small uk-background-default uk-width-small" @click="display('monthly')" id="monthlyBtn">Monthly</button>
+            </div>
+            <!-- Daily -->
+            <div id="dailyGraph" style="margin-top:5px;" class="uk-background-default">
+                <h2 style="margin-bottom:5px;">{{dateDay}}</h2>
+                <h4 style="margin-top:0px;">Your Activity Today</h4>
+                <div class="uk-grid-small uk-child-width-1-2 uk-text-center" style= "padding-bottom:30px; width:70%; margin:auto;"uk-grid>
+                    <div class="uk-card uk-card-default uk-card-body">
+                        <h4 class="uk-card-title">Time Today</h4>
+                        <span> {{totaltimeToday}} Hours </span>
+                    </div>
+                    <div class="uk-card uk-card-default uk-card-body">
+                        <h4 class="uk-card-title">Tasks Completed</h4>
+                        <span> {{totaltasksToday}} Tasks Completed Today! </span>
+                    </div>
+                    <div class="uk-card uk-card-default uk-card-body uk-width-1-1">
+                        <h4 class="uk-card-title">Goal Accomplished!</h4>
+                        <span v-if="goalToday" style="color:green;">Good Job!</span>
+                        <span v-else style="color:red;"> Let's get working! </span>
+                    </div>
+                </div>
+            </div>
+            <!-- Weekly and Monthly Plotly Graphs - hidden and shown on click -->
+            <div id="weeklyGraph" style="display:none"></div>
+            <div id="monthlyGraph" style="display:none"></div>
+        </div>
+
+        <hr style="height:1px; border:0; color:black; background-color:black; width:80%; margin:auto; margin-top:20px; margin-bottom:10px;">
+
+        <!-- Lifetime Stats -->
+        <div class="uk-container">
+            <div class="uk-text-center uk-child-width-1 uk-margin-small-top" style="margin:auto;" uk-grid>
+                <div class="uk-card uk-card-default uk-card-body" id="lifegoals">
+                    <h3 class="uk-card-title">Lifetime Goals Completed</h3>
+                    <a class="uk-card-badge uk-label" onclick='change("lifetasks")'>Switch</a>
+                    <h4 v-if="totalGoalsComplete != 0"> You've achieved {{totalGoalsComplete}} of your Goals ever since you started using StudyAT!</h4>
+                    <h4 v-else>You haven't completed a Goal just yet. Lets get to it!</h4>
+                </div>
+
+                <div class="uk-card uk-card-default uk-card-body" id="lifetasks" style="display:none;">
+                    <h3 class="uk-card-title">Lifetime Tasks Completed</h3>
+                    <a class="uk-card-badge uk-label" onclick='change("lifegoals")'>Switch</a>
+                    <h4 v-if="totalTaskComplete != 0">Till date, you've completed {{totalTaskComplete}} of your Tasks! Well Done!</h4>
+                    <h4 v-else>You haven't completed a Task just yet. Lets get to it!</h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+<!-- Firestore Updater -->
+<script type="module">
+    import { updateAllbyId, timelog } from '../js/firebase/firestoreInteraction.js';
+
+    const updateRequest = new Event('updateRequest')
+    const timeLog = new Event('timeLog')
+    // https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events
+
+    document.addEventListener('updateRequest', function () {
+        console.log("UPDATE REQUEST DETECTED")
+        var uid = sessionStorage.getItem('uid')
+        var obj = sessionStorage
+
+        updateAllbyId(uid, obj).then(function (obj) {
+        })
+    })
+
+    document.addEventListener('timeLogRequest', function () {
+        var uid = sessionStorage.getItem('uid')
+        var obj = sessionStorage
+
+        timelog(uid, obj).then(function (obj) {
+        })
+    })
+</script>
+
+<!-- Vue JS -->
+<script src="https://unpkg.com/vue@next"></script>
+
+<!-- Trianglify-->
+<script src='https://unpkg.com/trianglify@^4/dist/trianglify.bundle.js'></script>
+
+<!-- UIkit JS -->
+<script src="../js/uikit.min.js"></script>
+<script src="../js/uikit-icons.js"></script>
+
+<!-- Custom JS -->
+<script src="../js/statistics.js"></script>
+
+<script>
+
+    //Trianglify background
+    var choice = sessionStorage.getItem('favColor');
+    const pattern = trianglify({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        xColors: ['#000000', choice, '#FFFFFF']
+    }).toCanvas()
+
+    var dataUrl = pattern.toDataURL('image/png', (err, png) => { })
+
+    document.body.style.backgroundImage = "url('" + dataUrl + "')";
+
+</script>
+
+</html>

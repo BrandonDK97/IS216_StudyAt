@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>My Profile</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- UIkit CSS -->
+  <link rel="stylesheet" href="../css/uikit.min.css" />
+  <link rel='stylesheet' href='../css/nav.css' />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="../css/profile.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR-->
+  <div class="uk-position-relative ">
+    <img src="" alt="">
+    <div class="uk-position-top">
+      <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+        <div class='uk-navbar-left'>
+          <a href="roomV2.html" class='uk-navbar-item uk-logo'>
+            <section class="bglinear">
+              <span>STUDYAT.</span>
+            </section>
+          </a>
+        </div>
+        <div class="uk-navbar-center">
+          <ul class="uk-navbar-nav">
+            <li>
+              <a href="roomv2.html">My Room</a>
+            </li>
+            <li>
+              <a href="profile.html">My Profile</a>
+            </li>
+          </ul>
+        </div>
+        <div class='uk-navbar-right'>
+          <a class="uk-button uk-button-default uk-background-default" href="#settings" uk-toggle>Settings <span uk-icon="settings"></span></a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+
+  <div id='app'>
+    <!-- Profile Picture -->
+    <div>
+      <img :src= image id="profilePic" class="uk-align-center">
+    </div>
+
+    <!-- Profile Name -->
+    <div class="uk-margin-bottom" id="profileName">
+      <h1 class="uk-text-center uk-light">{{name}}</h1>
+    </div>
+
+    <!-- Simple details --> 
+    <div class="uk-container">
+      <div class="uk-child-width-expand@s uk-text-center uk-margin-bottom" uk-grid>
+        <div>
+          <div class="uk-card uk-card-default uk-card-body uk-card-hover" id="usage">
+            <h3 class="uk-card-title">Usage</h3>
+            <p>Total Study Time: {{convertToHours}} hours</p>
+          </div>
+        </div>
+        <div>
+          <div class="uk-card uk-card-default uk-card-body uk-card-hover" id="goals">
+            <h3 class="uk-card-title">My Goals</h3>
+            <p>Score A+ for WAD2 Project</p>
+          </div>
+        </div>
+        <div>
+          <div class="uk-card uk-card-default uk-card-body uk-card-hover" id="stats">
+            <h3 class="uk-card-title">Statistics</h3>
+            <a class="uk-card-badge uk-label" href="statistics.html">See More</a>
+            <span v-if="numGoals == 0">You're on your way to completing your first goal!</span>
+            <span v-else-if="numGoals == 1">You've completed your first goal since you started using this app! Keep it up!</span>
+            <span v-else>You've completed {{numGoals}} goals since you started using this app! Good Job!</span>
+          </div>
+        </div>
+      </div>
+      <hr style="height:0.5px; color:black; border-color:black; background-color:black">
+    </div>
+
+    <!-- Notes Bar -->
+    <div class="uk-container notes">
+      <div class="uk-flex" style="margin-top:5px;">
+        <h3 class="uk-light uk-width-expand"> My Notes</h3>
+        <button class="uk-button uk-button-default uk-background-default" @click= "deletenote()" style="margin-bottom:20px; opacity:0.9;" id="deleteBtn">Delete <span uk-icon="trash"></button>
+      </div>
+          
+      <div class="subjects">
+        <button class="uk-button uk-button-default uk-background-default backBtnHide" id="backBtn" @click="goBack()"><span
+            uk-icon="arrow-left"></span></button>
+        <button-component v-for="note in notes" v-bind:data_subj="note.title"></button-component>
+        <button class="uk-button uk-button-default uk-background-default" @click="addNewNote()"><span
+            uk-icon="plus"></button>
+      </div>
+
+      <hr style="height:1px; color:black; border-color:black; background-color:black">
+
+      <note-component v-for="note in notes" v-bind:title="note.title" v-bind:content="note.content" v-on:change="updateContentSession(note.title)"></note-component>
+    </div>
+
+  <!-- Settings Overlay -->
+  <div id="settings" class="uk-modal-full" uk-modal>
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+        <div class="uk-grid-collapse uk-child-width-1" uk-grid>
+          <div class="uk-padding-small" uk-height-viewport>
+              <h1>Settings <span uk-icon="icon:cog; ratio:2"></span></h1>
+              <hr style="height:1px;  background-color:black">
+              <h2 style="margin-top:5px;"> Change Profile Name </h2>
+              <div>
+                <input class= "uk-input uk-form-width-large" type="text" placeholder="Enter new name here" id="namechange">
+                <button class="uk-button uk-button-primary" @click="changeName()">Change</button>
+              </div>
+              <hr style="height:1px;  background-color:blue">
+              <h2 style="margin-top:5px;"> Change Colour Preference </h2>
+              <div>
+                <span uk-icon="paint-bucket" style="margin-right:10px;"></span>
+                <input class="uk-input uk-form-width-large" id="colourpicker" type="color" style="margin-right:10px">
+                <button class="uk-button uk-button-primary" @click="changeColour()">Change</button>
+              </div>
+              <span> This will take effect on your next page!</span>
+              <hr style="height:1px;  background-color:blue">
+              <div>
+                <h2 style="margin-top:5px;"> Change Music Preference </h2>
+                <button class="uk-button uk-button-primary uk-border-pill" @click="changeMusicPref('lofi')" style="margin-right:10px;" ><strong>Lo-Fi</strong></button>
+                <button class="uk-button uk-button-primary uk-border-pill" @click="changeMusicPref('rnb')" style="margin-right:10px;" ><strong>R&B</strong></button>
+                <button class="uk-button uk-button-primary uk-border-pill" @click="changeMusicPref('jazz')" style="margin-right:5px;" ><strong>Jazz</strong></button>
+              </div>
+              <hr style="height:1px;  background-color:blue">
+              <h2> Change Profile Picture </h2>
+              <image-change v-for="icon in icons" v-on:change="changeImg(icon)" v-bind:image="icon"></image-change>
+          </div>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+
+<!-- Firestore Updater -->
+<script type="module">
+  import { updateAllbyId } from '../js/firebase/firestoreInteraction.js';
+
+  const updateRequest = new Event('updateRequest')
+  // https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events
+
+  document.addEventListener('updateRequest', function(){
+    var uid = sessionStorage.getItem('uid')
+    var obj = sessionStorage
+
+    updateAllbyId(uid, obj).then(function(obj) {
+    })
+  })
+  document.dispatchEvent(new Event('updateRequest'));
+</script>
+
+<!-- UIkit JS -->
+<script src="../js/uikit.min.js"></script>
+<script src="../js/uikit-icons.js"></script>
+
+<!-- Vue JS -->
+<script src="https://unpkg.com/vue@next"></script>
+<script src="../js/profile.js"></script>
+
+<!-- Trianglify-->
+<script src='https://unpkg.com/trianglify@^4/dist/trianglify.bundle.js'></script>
+<script>
+  var choice = sessionStorage.getItem('favColor');
+  const pattern = trianglify({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    xColors: ['#000000', choice, '#FFFFFF']
+  }).toCanvas()
+
+  var dataUrl = pattern.toDataURL('image/png', (err, png) => { })
+
+  document.body.style.backgroundImage = "url('" + dataUrl + "')";
+</script>
+
+</html>

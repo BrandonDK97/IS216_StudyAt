@@ -1,0 +1,58 @@
+textarea {
+    height: 200px;
+    overflow-y: scroll;
+    resize: none;
+}
+
+#profilePic {
+    margin-top: 65px;
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.subjectContent {
+    display: none;
+}
+
+.activeSubject {
+    display: block;
+}
+
+.hideSubject {
+    display: none;
+}
+
+.backBtnHide {
+    display: none;
+}
+
+.backBtn {
+    display: inline-block;
+}
+
+.noteContent {
+    display: none;
+}
+
+.activeNote {
+    display: block;
+}
+
+.activeTab {
+    background-color: black;
+}
+
+#app {
+    min-height: 100vh;
+    height: 100%;
+}
+
+.bglinear span {
+    color: transparent;
+    font-size: 1em;
+    font-family: "Josefin Sans", sans-serif;
+    -webkit-text-stroke: 2px rgba(133, 133, 133, 1);
+    backface-visibility: none;
+}

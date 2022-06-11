@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>StudyAt - User Customization</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="../css/uikit.min.css" />
+
+    <style>
+        .bglinear span {
+            color: transparent;
+            font-size: 1em;
+            font-family: "Josefin Sans", sans-serif;
+            -webkit-text-stroke: 2px rgb(255, 255, 255);
+            backface-visibility: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <div class="uk-position-relative">
+        <img src="" alt="">
+        <div class="uk-position-top">
+            <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+                <div class='uk-navbar-left'>
+                    <a href="../index.html" class='uk-navbar-item uk-logo'>
+                        <section class="bglinear">
+                            <span>STUDYAT.</span>
+                        </section>
+                    </a>
+                </div>
+                <div class="uk-navbar-center">
+                    <ul class="uk-navbar-nav">
+                        <li class="uk-active"><a href="../index.html">Back to Home</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div>
+        <div id="custom" class="uk-section uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport>
+            <div class="uk-width-1-1">
+                <div class="uk-container">
+                    <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
+                        <div class="uk-width-1-1@m">
+                            <div
+                                class="uk-margin uk-width-xlarge uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
+                                <h3 class="uk-card-title uk-text-center"> Tell us about yourself.</h3>
+                                <!-- <form> For some reason, removing the form tag will allow the javascript to log in-->
+                                <!-- Name Question -->
+                                <h4 class="uk-text-default uk-margin-small"> What's your name? </h4>
+                                <div class="uk-margin-remove-top">
+                                    <div class="uk-inline uk-width-1-1">
+                                        <span class="uk-form-icon" uk-icon="icon: user"></span>
+                                        <input id="username" class="uk-input" type="text" v-model="name">
+                                    </div>
+                                </div>
+                                <!-- Color Question -->
+                                <h4 class="uk-text-default uk-margin-small"> Pick a profile colour that describes you
+                                    best. </h4>
+                                <div class="uk-margin-remove-top">
+                                    <div class="uk-inline uk-width-1-1">
+                                        <span class="uk-form-icon" uk-icon="icon: paint-bucket"></span>
+                                        <input id="userColor" class="uk-input" type="color" v-bind:value="color"
+                                            v-on:change="changeColour()">
+                                    </div>
+                                </div>
+                                <!-- Music Question -->
+                                <music-component @musicname='changeMusic'></music-component>
+                                <div id="errorAlert" class="uk-alert-danger" uk-alert v-show='alertReason'>
+                                    <!-- change = display: block or none-->
+                                    <p id="errorMessage">Not all fields are set!</p>
+                                    <!-- insert error message using DOM -->
+                                </div>
+
+                                <div class="uk-margin">
+                                    <button id="login"
+                                        class="uk-button uk-button-secondary uk-button-medium uk-width-1-2 uk-align-center"
+                                        @click="pushCustomizedData()">Enter virtual world</button>
+                                </div>
+                                <!-- </form> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firestore Updater -->
+        <script type="module">
+            import { updateAllbyId } from '../js/firebase/firestoreInteraction.js';
+
+            document.getElementById("login").addEventListener('click', function () {
+                if (sessionStorage.getItem('eventStatus') == 'true') { // All fields are set
+                    // Push data from session to firestore
+                    var uid = sessionStorage.getItem('uid')
+                    var obj = sessionStorage
+
+                    updateAllbyId(uid, obj).then(function (obj) {
+                        sessionStorage.removeItem('eventStatus')
+                        window.location.replace("roomV2.html")
+                    })
+                }
+            })
+        </script>
+
+        <!-- VUE.JS 3 -->
+        <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
+
+        <!-- UIkit JS -->
+        <script src="../js/user_customization_vue.js"></script>
+        <script src="../js/uikit.min.js"></script>
+        <script src="../js/uikit-icons.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Study Room</title>
+
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="../css/uikit.min.css" />
+
+
+    <!-- Custom CSS-->
+    <link rel='stylesheet' href='../css/nav.css' />
+    <link rel='stylesheet' href='../css/clock.css' />
+    <link rel='stylesheet' href='../css/todolist.css'>
+
+    <!-- POMODORO CSS-->
+    <link rel='stylesheet' href='../css/pomodoro.css'>
+
+    <!-- VUE.JS 3 -->
+    <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/roomv2.css">
+
+</head>
+
+<body onload="startSession()">
+
+
+    <!-- Webpage Background -->
+    <div id='videos' style="position: fixed; top: 0; min-width: 100%; min-height: 100%; z-index: -1;display: none;">
+        <video style="height: 100vh; min-height: 100%;" autoplay muted loop id="rainVid">
+            <source muted id='vidSrc' type="video/mp4">
+        </video>
+    </div>
+
+    <div id='app'>
+        <!-- Loading -->
+        <div v-show='firstTime = "false"'>
+            <div class="uk-container-expand uk-flex uk-margin-xlarge-top" id='loader' style='margin-top:50px;'>
+                <div class='uk-flex-row uk-margin-auto uk-width-1-4'>
+                    <progress id="js_progressbar" class="uk-progress" value="10" max="70"></progress>
+                    <h4 id='lWords' class='uk-text-center uk-text-bold'>Setting the table...</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- FullScreen Tutorial with Images -->
+        <button uk-toggle="target: #tut1" type="button" id="modal-btn" onload="click()" style="display:none"></button>
+
+        <div id="tut1" class="uk-modal-full" uk-modal>
+            <div class="uk-modal-dialog">
+                <button class="uk-modal-close-full uk-close-large" type="button" @click='enterRoom()' uk-close></button>
+                <div class="uk-grid-collapse uk-child-width-1-2@s uk-flex-middle" uk-grid>
+                    <img class="uk-background-cover" src='../Css/img/01.jpg' style=" background-size: contain;"
+                        uk-height-viewport>
+                    <div class="uk-padding-large">
+                        <h1>Welcome to your Virtual Room</h1>
+                        <p>In this virtual workspace, the choice is yours! Work or chill, we got it covered!</p>
+                        <a href="#tut2" class="uk-button uk-button-primary" uk-toggle>Next</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tut2" class="uk-modal-full" uk-modal>
+            <div class="uk-modal-dialog">
+                <button class="uk-modal-close-full uk-close-large" type="button" @click='enterRoom()' uk-close></button>
+                <div class="uk-grid-collapse uk-child-width-1-2@s uk-flex-middle" uk-grid>
+                    <div class="uk-background-cover" style="background-image: url('../css/img/02.jpg');"
+                        uk-height-viewport></div>
+                    <div class="uk-padding-large">
+                        <h1>StudyAT provides a Pomodoro Timer</h1>
+                        <p>Keep track of your study session</p>
+                        <a href="#tut1" class="uk-button uk-button-primary" uk-toggle>Back</a>
+                        <a href="#tut3" class="uk-button uk-button-primary" uk-toggle>Next</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tut3" class="uk-modal-full" uk-modal>
+            <div class="uk-modal-dialog">
+                <button class="uk-modal-close-full uk-close-large" type="button" @click='enterRoom()' uk-close></button>
+                <div class="uk-grid-collapse uk-child-width-1-2@s uk-flex-middle" uk-grid>
+                    <div class="uk-background-cover"
+                        style="background-image: url('../css/img/03.png'); background-size: contain;"
+                        uk-height-viewport></div>
+                    <div class="uk-padding-large">
+                        <h1>Features Bar</h1>
+                        <p>Here you can customise your room!</p>
+                        <p>Background Image change, Spotify Music, To-do list, Games etc</p>
+                        <a href="#tut2" class="uk-button uk-button-primary" uk-toggle>Back</a>
+                        <a href="#tut4" class="uk-button uk-button-primary" uk-toggle>Next</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tut4" class="uk-modal-full" uk-modal>
+            <div class="uk-modal-dialog">
+                <button class="uk-modal-close-full uk-close-large" type="button" @click='enterRoom()' uk-close></button>
+                <div class="uk-grid-collapse uk-child-width-1-2@s uk-flex-middle" uk-grid>
+                    <div class="uk-background-cover" style="background-image: url('../css/img/04.jpg');"
+                        uk-height-viewport></div>
+                    <div class="uk-padding-large">
+                        <h1>Music</h1>
+                        <p> Get into that study mood with our playlists!</p>
+                        <p> Ready to get started?</p>
+                        <a href="#tut3" class="uk-button uk-button-primary" uk-toggle>Back</a>
+                        <button class="uk-button uk-button-default uk-modal-close" @click='enterRoom()'
+                            type="button">Enter your
+                            room!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Content -->
+        <div class="uk-container-expand uk-flex uk-position-relative" style="height: 100vh;display:none" id='room'>
+
+            <!-- Notes -->
+            <div class="draggable" v-for='note in showNotes'>
+                <i class="fas fa-times" v-on:click='removeNote(note)'
+                    style='float:right;margin-right:2px;margin-top:2px;cursor:pointer'></i>
+                <div class="uk-text-center" v-bind:id='drag'>
+                    <h6><b>{{note.subject}} : {{note.title}}</b></h6>
+                </div>
+                <p class='noteContent'>
+                    {{note.content}}
+                </p>
+            </div>
+
+            <!-- Clock -->
+            <clock-component></clock-component>
+
+
+            <!-- Goal Setter -->
+            <div id='goalSetter'
+                class="uk-animation-fade uk-border-rounded uk-text-center uk-box-shadow-small uk-dark uk-background-default uk-position-top-center uk-margin-small-top uk-padding-small">
+                <span class="uk-margin-bottom-small uk-text-bold uk-text-default">Set a goal for this session</span>
+                <br>
+                <div class="uk-inline">
+                    <span class="uk-form-icon" uk-icon="icon: info"></span>
+                    <input class="uk-input" v-model="goal" v-on:keyup.enter="onEnter">
+                </div>
+            </div>
+
+            <!-- Pomodoro Timer -->
+            <pomodoro-component :goal='goal'></pomodoro-component>
+
+            <!--Settings Bar -->
+            <setting-component></setting-component>
+
+            <!--ICON Bar -->
+            <icon-component></icon-component>
+
+            <!-- Spotify Embed -->
+            <div id='spotifyembed'
+                class='uk-animation-fade uk-border-rounded uk-box-shadow-small uk-background-default uk-position-center-right uk-margin-small-right uk-margin-small-top uk-width-1-4 uk-text-center dragComponent'>
+                <i uk-toggle='target: #spotifyembed' class="fas fa-times"
+                    style='float:right;margin-right:10px;;cursor:pointer'></i>
+                <button class="uk-button uk-button-secondary uk-margin-small" style="border-radius: 10px;width:80%;"
+                    id="spotify_search" onclick="generatePlaylist()">Generate Playlist</button>
+                <div id="song-list" class="uk-margin uk-grid">
+                    <div id="song_0" class="uk-width-1-1"></div>
+                </div>
+            </div>
+
+            <!-- To-Do List -->
+            <todolist-component></todolist-component>
+
+            <!-- Feature Bar -->
+            <div class='uk-animation-fade uk-position-bottom-center uk-border-rounded uk-box-shadow-small uk-background-default uk-margin-medium-bottom uk-flex'
+                id='featureBar'>
+                <button class="uk-button uk-button-default">
+                    <span class='fas fa-image'></span>
+                    <span class='fWord'> Background</span></button>
+                <div uk-drop="pos: top-left">
+                    <div class="uk-card uk-card-default" id="background">
+                        <div class='uk-card-body  uk-text-center'>
+                            <h5 class='uk-text-bold'>Choose a world to explore</h5>
+                            <button id='01' value="beach_loop.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;'
+                                    class='fas fa-umbrella-beach uk-padding-remove'></span>
+                            </button>
+                            <button id='02' value="pixelroom.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;'
+                                    class='far fa-meh-blank uk-padding-remove'></span>
+                            </button>
+                            <button id='03' value="Coffeeshop.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;' class='fas fa-mug-hot uk-padding-remove'></span>
+                            </button>
+                            <button id='04' value="rain.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;'
+                                    class='fas fa-umbrella uk-padding-remove'></span>
+                            </button>
+                            <button id='05' value="Trees.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;' class='fas fa-tree uk-padding-remove'></span>
+                            </button>
+                            <button id='06' value="Underwater.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;' class='fas fa-water uk-padding-remove'></span>
+                            </button>
+                            <button id='07' value="Sunset.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;'
+                                    class='fas fa-cloud-sun uk-padding-remove'></span>
+                            </button>
+                            <button id='08' value="Snow.mp4" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                <span style='width: 35px; height:20px;'
+                                    class='far fa-snowflake uk-padding-remove'></span>
+                            </button>
+                            <button id='09' value="default" onclick='videoChange(this.value)'
+                                class='uk-button uk-button-default'>
+                                Default
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button uk-toggle='target: #spotifyembed' class="uk-button uk-button-default">
+                    <span class='fas fa-music'></span>
+                    <span class='fWord'> Music</span></button>
+                <button uk-toggle='target: #todoList' class="uk-button uk-button-default">
+                    <span class='fas fa-clipboard-list'></span>
+                    <span class='fWord'> To-Do List</span></button>
+                <a class="uk-button uk-button-default" href="games.html" target="_blank"><span
+                        class='fas fa-gamepad'></span>
+                    <span class='fWord'> Games</span></a>
+                <button class="uk-button uk-button-default" uk-toggle='target: #note-list'>
+                    <span class='fas fa-sticky-note'></span>
+                    <span class='fWord'> Notes</span></button>
+            </div>
+
+            <!-- Toggle for Light mode/Dark mode -->
+            <div id='change'
+                class='uk-animation-fade uk-border-rounded uk-box-shadow-small uk-dark uk-background-default uk-position-bottom-left uk-margin-medium-bottom uk-margin-small-left uk-padding-small'>
+                <a class="uk-text-decoration-none" onclick="changeMode()"><i id='innerIcon' class="fas fa-sun"></i></a>
+            </div>
+        </div>
+
+        <!-- Notes off-canvas sidebar -->
+        <div id="note-list" uk-offcanvas='bg-close'>
+            <div class="uk-offcanvas-bar uk-overflow-auto">
+                <div class="uk-card uk-card-default uk-card-body uk-margin-small-top uk-text-center"
+                    v-for='note in notes'>
+                    <h3 class="uk-card-title">{{note.subject}} : {{note.title}}</h3>
+                    <a href="#" @click='pushNote(note)' class="uk-button uk-button-text uk-text-danger">Show</a>
+                </div>
+                <button class="uk-offcanvas-close" type="button" uk-close></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firestore Updater -->
+    <script type="module">
+        import { updateAllbyId } from '../js/firebase/firestoreInteraction.js';
+
+        const updateRequest = new Event('updateRequest')
+        // https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events
+
+        document.addEventListener('updateRequest', function () {
+            var uid = sessionStorage.getItem('uid')
+            var obj = sessionStorage
+
+            updateAllbyId(uid, obj).then(function (obj) {
+                //Do Nothing
+            })
+        })
+        document.dispatchEvent(new Event('updateRequest'));
+    </script>
+
+    <!-- UIkit JS -->
+    <script src="../js/uikit.min.js"></script>
+    <script src="../js/uikit-icons.js"></script>
+
+    <!-- JQuery -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+
+    <!-- Trianglify-->
+    <script src='https://unpkg.com/trianglify@^4/dist/trianglify.bundle.js'></script>
+
+    <!-- InteractJS -->
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+
+    <!-- AWS Javascript SDK -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1023.0.min.js"></script>
+
+    <!--TimeMe.js-->
+    <script src='../js/timeme.min.js'></script>
+
+    <!-- Typed.js -->
+    <script src="../js/typed.min.js"></script>
+
+    <!-- Icons -->
+    <script src="https://kit.fontawesome.com/979f8a9a53.js" crossorigin="anonymous"></script>
+
+    <!-- Spotify script -->
+    <script src="../Js/spotifyapi.js"></script>
+
+    <!-- Custom JS -->
+    <script src='../js/roomV2vue.js'></script>
+    <script src='../js/roomV2.js'></script>
+
+</body>
+
+</html>
